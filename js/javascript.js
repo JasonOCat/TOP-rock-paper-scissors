@@ -28,27 +28,12 @@ function game() {
     let playerScore = 0;
     let computerScore = 0;
     let playerSelection;
-    let checkChoice;
     let computerSelection;
 
     for (let index = 0; index < 5; index++) {
-        do {
-            playerSelection = prompt(`Round ${index+1}, your Choice : Rock, Paper or Scissors ? `);
-            if (playerSelection === undefined || playerSelection === null || playerSelection === "") {
-                alert("Please choose between Rock, Paper and scissors");
-                checkChoice = false;
-            }
-            else {
-                playerSelection = playerSelection.toLowerCase();
-                checkChoice = playerSelection === "rock" || playerSelection === "paper" || playerSelection === "scissors";
-                if (!checkChoice) {
-                    alert("Please choose between Rock, Paper and scissors");
-                }
-            }
-        } while (!checkChoice)
-
+        playerSelection = getPlayerChoice(index);
         computerSelection = getComputerChoice();
-        
+
         let result = playRound(playerSelection, computerSelection);
         if (result.isDraw !== true) {
             if (result.isPlayerWinner) {
@@ -58,11 +43,36 @@ function game() {
                 computerScore++;
             }
         }
-        console.log(`Round ${index+1}, you chose ${playerSelection} and the computer chose ${computerSelection}`);
-        console.log(`RESULT round ${index+1} : ${result.messageResult}, the score is ${playerScore}-${computerScore}`);
+    
+        displayCurrentScore(index, result, playerSelection, playerScore, computerSelection, computerScore)
 
     }
 
+    displayFinalScore(playerScore, computerScore)
+}
+
+function getPlayerChoice(index) {
+    let playerSelection;
+    do {
+        playerSelection = prompt(`Round ${index+1}, your Choice : Rock, Paper or Scissors ? `);
+        if (playerSelection === undefined || playerSelection === null || playerSelection === "") {
+            alert("Please choose between Rock, Paper and scissors");
+            checkChoice = false;
+        }
+        else {
+            playerSelection = playerSelection.toLowerCase();
+            checkChoice = playerSelection === "rock" || playerSelection === "paper" || playerSelection === "scissors";
+            if (!checkChoice) {
+                alert("Please choose between Rock, Paper and scissors");
+            }
+        }
+    } while (!checkChoice)
+
+    return playerSelection;
+}
+
+
+function displayFinalScore(playerScore, computerScore) {
     if (playerScore === computerScore) {
         console.log(`It's a draw ! The score is ${playerScore}-${computerScore}`);
     }
@@ -73,5 +83,12 @@ function game() {
         console.log(`The final score is : ${playerScore}-${computerScore}, You Lose !`);
     }
 }
+
+function displayCurrentScore(index, result, playerSelection, playerScore, computerSelection, computerScore) {
+    console.log(`Round ${index+1}, you chose ${playerSelection} and the computer chose ${computerSelection}`);
+    console.log(`RESULT round ${index+1} : ${result.messageResult}, the score is ${playerScore}-${computerScore}`);
+}
+
+
 
 game();
