@@ -5,90 +5,85 @@ function getComputerChoice() {
 
 
 function playRound(playerSelection, computerSelection) {
-    let formattedPlayerSelection = playerSelection.toLowerCase();
-    switch (formattedPlayerSelection) {
+    switch (playerSelection) {
         case (computerSelection):
-            let map = {isDraw: true, messageResult: `DRAW ! You and the computer chose ${playerSelection}`};
+            let map = { isDraw: true, messageResult: `DRAW ! You and the computer chose ${playerSelection}` };
             return map;
 
         case ("rock"):
-            return computerSelection === "paper" ? {isPlayerWinner: false, messageResult: "You LOSE ! Paper beats Rock"} : {isPlayerWinner: true, messageResult: "You WON ! Rock beats Scissors"};
-            
+            return computerSelection === "paper" ? { isPlayerWinner: false, messageResult: "You LOSE ! Paper beats Rock" } : { isPlayerWinner: true, messageResult: "You WON ! Rock beats Scissors" };
+
         case ("paper"):
-            return computerSelection === "scissors" ? {isPlayerWinner: false, messageResult: "You LOSE ! Scissors beats Paper"} : {isPlayerWinner: true, messageResult: "You WON ! Paper beats Rock"};
+            return computerSelection === "scissors" ? { isPlayerWinner: false, messageResult: "You LOSE ! Scissors beats Paper" } : { isPlayerWinner: true, messageResult: "You WON ! Paper beats Rock" };
 
         case ("scissors"):
-            return computerSelection === "rock" ? {isPlayerWinner: false, messageResult: "You LOSE ! Rock beats Scissors"} : {isPlayerWinner: true, messageResult: "You WON ! Scissors beats Paper"};
-        default :
+            return computerSelection === "rock" ? { isPlayerWinner: false, messageResult: "You LOSE ! Rock beats Scissors" } : { isPlayerWinner: true, messageResult: "You WON ! Scissors beats Paper" };
+        default:
             throw Error("Something went wrong");
     }
 }
 
-function game() {
-    let playerScore = 0;
-    let computerScore = 0;
-    let playerSelection;
-    let computerSelection;
+function updateCurrentScore(result, scorePara, historyDiv, messageResultRound, playerScore, computerScore) {
+    messageResultRound.innerHTML = result.messageResult;
+    historyDiv.appendChild(messageResultRound);
+    scorePara.textContent = `The score is ${playerScore}-${computerScore}`;
+}
 
-    for (let index = 0; index < 5; index++) {
-        playerSelection = getPlayerChoice(index);
-        computerSelection = getComputerChoice();
+function checkWinner(scorePara, playerScore, computerScore) {
+    if (playerScore == 5) {
+        scorePara.textContent = `You Won ${playerScore}-${computerScore}!`;
+        alert(`You Won ${playerScore}-${computerScore}!`);
+        return true;
+    }
+    else if (computerScore == 5) {
+        scorePara.textContent = `You Lost ${playerScore}-${computerScore}!`;
+        alert(`You Lost ${playerScore}-${computerScore}!`);
+        return true;
+    }
 
-        let result = playRound(playerSelection, computerSelection);
+    return false;
+}
+
+function resetGame(scorePara, historyDiv) {
+    scorePara.textContent = "Start new game of 5 rounds !"
+    scorePara.setAttribute("data-player-score", 0);
+    scorePara.setAttribute("data-computer-score", 0);
+    historyDiv.textContent = "";
+}
+
+
+const buttons = document.querySelectorAll("button");
+buttons.forEach(choice =>
+    choice.addEventListener("click", (e) => {
+        const result = playRound(e.target.className, getComputerChoice());
+        const messageResultRound = document.createElement('p');
+        const historyDiv = document.querySelector(".history");
+        let scorePara = document.querySelector(".score");
+        let playerScore = scorePara.getAttribute("data-player-score");
+        let computerScore = scorePara.getAttribute("data-computer-score");
+
+        //Update current score
         if (result.isDraw !== true) {
             if (result.isPlayerWinner) {
                 playerScore++;
+                scorePara.setAttribute("data-player-score", playerScore);
+
             }
             else {
                 computerScore++;
+                scorePara.setAttribute("data-computer-score", computerScore);
             }
         }
-    
-        displayCurrentScore(index, result, playerSelection, playerScore, computerSelection, computerScore)
 
-    }
+        updateCurrentScore(result, scorePara, historyDiv, messageResultRound, playerScore, computerScore);
 
-    displayFinalScore(playerScore, computerScore)
-}
-
-function getPlayerChoice(index) {
-    let playerSelection;
-    do {
-        playerSelection = prompt(`Round ${index+1}, your Choice : Rock, Paper or Scissors ? `);
-        if (playerSelection === undefined || playerSelection === null || playerSelection === "") {
-            alert("Please choose between Rock, Paper and scissors");
-            checkChoice = false;
+        if (checkWinner(scorePara, playerScore, computerScore)) {
+            resetGame(scorePara, historyDiv)
         }
-        else {
-            playerSelection = playerSelection.toLowerCase();
-            checkChoice = playerSelection === "rock" || playerSelection === "paper" || playerSelection === "scissors";
-            if (!checkChoice) {
-                alert("Please choose between Rock, Paper and scissors");
-            }
-        }
-    } while (!checkChoice)
 
-    return playerSelection;
-}
-
-
-function displayFinalScore(playerScore, computerScore) {
-    if (playerScore === computerScore) {
-        console.log(`It's a draw ! The score is ${playerScore}-${computerScore}`);
-    }
-    else {
-        playerScore > computerScore ?
-        console.log(`The final score is : ${playerScore}-${computerScore}, you Won ! `)
-        :
-        console.log(`The final score is : ${playerScore}-${computerScore}, You Lose !`);
-    }
-}
-
-function displayCurrentScore(index, result, playerSelection, playerScore, computerSelection, computerScore) {
-    console.log(`Round ${index+1}, you chose ${playerSelection} and the computer chose ${computerSelection}`);
-    console.log(`RESULT round ${index+1} : ${result.messageResult}, the score is ${playerScore}-${computerScore}`);
-}
+    })
+);
 
 
 
-game();
+//game();
